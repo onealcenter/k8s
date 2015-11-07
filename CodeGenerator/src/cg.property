@@ -1,0 +1,4 @@
+URL=jdbc:oracle:thin:@//localhost:1521/ORCL
+USER=scott
+PASSWORD=tiger
+DRIVER=oracle.jdbc.pool.OracleDataSource
