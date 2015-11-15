@@ -1,0 +1,37 @@
+crtmqm qmr1 创建队列管理器(qmr1、qmr2、qmr3,其中qmr1为网关节点)
+strmqm qmr1 启动队列管理器
+runmqlsr -t tcp -p 40025/40026/40027 -m qmr1/qmr2/qmr3 & 启动监听
+runmqsc
+alter qmgr repos(qmr_c) 集群中创建完全存储，qmr_c为集群名称
+------------------------------------------------------------------------------------------------------------------------------
+此种集群通道设置方式有问题：qmr1看不全本地队列
+runmqsc qmr1
+define channel(to.1) chltype(clusrcvr) trptype(tcp) conname('192.168.22.11(40025)') cluster(qmr_c)
+define channel(to.2) chltype(clussdr) trptype(tcp) conname('192.168.22.11(40026)') cluster(qmr_c)
+runmqsc qmr2
+define channel(to.2) chltype(clusrcvr) trptype(tcp) conname('192.168.22.11(40026)') cluster(qmr_c)
+define channel(to.3) chltype(clussdr) trptype(tcp) conname('192.168.22.11(40027)') cluster(qmr_c)
+runmqsc qmr3
+define channel(to.3) chltype(clusrcvr) trptype(tcp) conname('192.168.22.11(40027)') cluster(qmr_c)
+define channel(to.2) chltype(clussdr) trptype(tcp) conname('192.168.22.11(40026)') cluster(qmr_c)
+------------------------------------------------------------------------------------------------------------------------------
+A为qmr1的接收通道和qmr2、qmr3的发送通道；B为qmr2的接收通道；C为qmr3的接收通道
+runmqsc qmr1 
+define channel(A) chltype(clusrcvr) trptype(tcp) conname('192.168.22.11(40025)') cluster(qmr_c)
+runmqsc qmr2
+define channel(B) chltype(clusrcvr) trptype(tcp) conname('192.168.22.11(40026)') cluster(qmr_c)
+define channel(A) chltype(clussdr) trptype(tcp) conname('192.168.22.11(40025)') cluster(qmr_c)
+runmqsc qmr3
+define channel(C) chltype(clusrcvr) trptype(tcp) conname('192.168.22.11(40027)') cluster(qmr_c)
+define channel(A) chltype(clussdr) trptype(tcp) conname('192.168.22.11(40025)') cluster(qmr_c)
+-----------------------------------------------------------------------------
+runmqsc qmr2/qmr3
+define qlocal(l.test) cluster(qmr_c) //本地队列
+runmqsc qmr1
+define channel(qmr_c_rcvr_chl) chltype(rcvr) trptype(tcp) //接受通道
+define qremote(ll) //qmr1别名
+----------------------------------------------------------------------
+以下是对手方本地传输队列、远程队列和发送通道
+define qlocal(l.t) usage(xmitq) defpsist(yes) initq(system.channel.initq)
+define qremote(r.q) rname(l.test) rqmname(ll) xmitq(l.t) //rname对应集群本地队列 rqmname对应集群连接队列管理器的别名
+define channel(qmr_c_rcvr_chl) chltype(sdr) conname('192.168.22.11(40025)') xmitq(L.T) //与集群接收通道相同
