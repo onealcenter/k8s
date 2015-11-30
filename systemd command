@@ -1,1 +1,2 @@
-
+systemd-analyze or systemd-analyze time
+//startup finished in kernel + initrd + userspace
