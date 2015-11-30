@@ -1,2 +1,8 @@
-systemd-analyze or systemd-analyze time
-//startup finished in kernel + initrd + userspace
+systemd-analyze
+systemd-analyze time //startup finished in kernel + initrd + userspace 显示启动是内核和用户空间的消耗时间
+
+systemd-analyze blame //查看详细的每个服务消耗的启动时间
+
+systemd-analyze critical-chain //查看严重消耗时间的服务树状表，按照启动消耗的时间进行排序，时间消耗越多，越排到前面。@之后是服务激活或者启动的时间，+号之后是服务启动消耗的时间
+
+systemd-analyze plot > plot.svg //生成服务消耗时间表并生成plot.svg文件
