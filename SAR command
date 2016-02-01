@@ -1,0 +1,49 @@
+-A：所有报告的总和
+-u：CPU利用率
+-v：进程、I节点、文件和锁表状态
+-d：硬盘使用报告
+-r：没有使用的内存页面和硬盘块
+-g：串口I/O的情况
+-b：缓冲区使用情况
+-a：文件读写情况
+-c：系统调用情况
+-R：进程的活动情况
+-y：终端设备活动情况
+-w：系统交换活动
+
+(1) sar -u -o sar.file 3 5 每3秒输出cpu信息到当前目录sar.file文件 默认路径/var/log/sa/
+    Linux 3.13.0-24-generic (ubuntu) 	01/31/2016 	_i686_	(4 CPU)
+    06:44:51 PM     CPU     %user     %nice   %system   %iowait    %steal     %idle
+    06:44:54 PM     all     17.56      0.00     23.53      0.00      0.00     58.91
+    06:44:57 PM     all      8.70      0.00     17.22      0.00      0.00     74.08
+    06:45:00 PM     all      8.70      0.00     17.39      0.00      0.00     73.91
+    06:45:03 PM     all      8.88      0.00     17.59      0.00      0.00     73.53
+    06:45:06 PM     all      9.37      0.00     16.90      0.00      0.00     73.72
+    Average:        all     10.59      0.00     18.49      0.00      0.00     70.91
+    
+    %user：CPU处在用户模式下的时间百分比
+　　%system：CPU处在系统模式下的时间百分比
+　　%iowait：CPU等待输入输出完成时间的百分比
+　　%idle：CPU空闲时间百分比
+　　
+　　%iowait,表示硬盘存在I/O瓶颈
+　　%idle值高,表示CPU较空闲
+　　%idle值高但系统响应慢时,有可能是CPU等待分配内存,此时应加大内存容量
+　　%idle值如果持续低于10,那么系统的CPU处理能力相对较低,最需要解决的资源是CPU
+　　
+(2) sar -v
+    Linux 3.13.0-24-generic (ubuntu) 	01/31/2016 	_i686_	(4 CPU)
+    06:58:02 PM dentunusd   file-nr  inode-nr    pty-nr
+    06:58:05 PM     60926      8576     58216        25
+    06:58:08 PM     60926      8576     58216        25
+    06:58:11 PM     60926      8576     58211        25
+    Average:        60926      8576     58214        25
+
+(3) sar -d
+    Linux 3.13.0-24-generic (ubuntu) 	01/31/2016 	_i686_	(4 CPU)
+    07:09:34 PM       DEV       tps  rd_sec/s  wr_sec/s  avgrq-sz  avgqu-sz     await     svctm     %util
+    07:09:37 PM    dev2-0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+    07:09:37 PM    dev8-0      0.67      0.00     34.67     52.00      0.00      2.00      2.00      0.13
+    Average:          DEV       tps  rd_sec/s  wr_sec/s  avgrq-sz  avgqu-sz     await     svctm     %util
+    Average:       dev2-0      0.00      0.00      0.00      0.00      0.00      0.00      0.00      0.00
+    Average:       dev8-0      0.67      0.00     34.67     52.00      0.00      2.00      2.00      0.13
