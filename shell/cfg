@@ -1,0 +1,4 @@
+namespace=default
+service=redis-slot1
+service=redis-slot2
+service=redis-slot3
