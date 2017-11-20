@@ -1,0 +1,39 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: kafka
+  labels:
+    app: kafka
+spec:
+  ports:
+  - port: 9092
+    name: listener
+  clusterIP: None
+  selector:
+    app: kafka
+---
+apiVersion: apps/v1beta1
+kind: StatefulSet
+metadata:
+  name: kafka
+spec:
+  selector:
+    matchLabels:
+      app: kafka
+  serviceName: "kafka"
+  replicas: 3
+  template:
+    metadata:
+      labels:
+        app: kafka
+    spec:
+      terminationGracePeriodSeconds: 10
+      containers:
+      - name: kafka
+        image: ly/kafka:v1
+        command: ["/bin/sh"]
+        args: ["-c", "num=`echo ${HOSTNAME} | awk -F[-] '{print $2}'`; id=`expr ${num} + 1`; sed -i '/broker.id=/c broker.id='${id}'' /${KAFKA_HOME}/config/server.properties; sed -i '/zookeeper.connect=/c zookeeper.connect=zk-0.zk.default.svc.cluster.local:2181,zk-1.zk.default.svc.cluster.local:2181,zk-2.zk.default.svc.cluster.local:2181' /${KAFKA_HOME}/config/server.properties; sed -i '/advertised.listeners=/c advertised.listeners=PLAINTEXT://'${HOSTNAME}'.kafka.default.svc.cluster.local:9092' /${KAFKA_HOME}/config/server.properties; sed -i '/log.dirs=/c log.dirs=/kafka-logs' /${KAFKA_HOME}/config/server.properties; cd /${KAFKA_HOME}; bin/kafka-server-start.sh config/server.properties"]
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 9092
+          name: listener
